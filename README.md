@@ -18,9 +18,9 @@ This ensures minimal material waste and quick calculation of the required linear
 
 ## 🖼 Screenshots
 
-![Screenshot 3](https://github.com/user-attachments/assets/852d7e2a-5df4-4e20-a188-3f1ecfff9c2b)
-![Screenshot 2](https://github.com/user-attachments/assets/11482be5-d1b4-4754-82e8-5d72069809b0)
 ![Screenshot 1](https://github.com/user-attachments/assets/78b36a4d-2514-4e8c-820b-5cc68858f2aa)
+![Screenshot 2](https://github.com/user-attachments/assets/11482be5-d1b4-4754-82e8-5d72069809b0)
+![Screenshot 3](https://github.com/user-attachments/assets/852d7e2a-5df4-4e20-a188-3f1ecfff9c2b)
 
 ---
 
