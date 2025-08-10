@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PDFRollCalculator</title>
+<style>
+  /* Import Google Fonts - Montserrat */
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+  
+  /* Global body styling */
+  body {
+    font-family: 'Montserrat', Arial, sans-serif;
+    background: #f4f8ff;
+    color: #222;
+    margin: 0;
+    padding: 0;
+  }
+  h1, h2, h3 { margin: 0; }
+  
+  /* Main container styling */
+  .container {
+    max-width: 950px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.08);
+    padding: 32px 28px 28px 28px;
+  }
+  h1 {
+    text-align: center;
+    color: #007bff;
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  h2 {
+    text-align: center;
+    color: hwb(226 31% 37%);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  h3 {
+    text-align: center;
+    color: hsl(211, 20%, 41%);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+  }
+  
+  /* Input row container for roll width inputs */
+  .inputs-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    margin-bottom: 18px;
+  }
+  
+  /* Individual input group styling */
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+    gap: 4px;
+  }
+  .input-group label {
+    font-weight: 700;
+    color: #0056b3;
+    margin-bottom: 2px;
+    font-size: 1.04rem;
+    width: 100%;
+    text-align: center;
+  }
+  .input-group input[type="number"] {
+    width: 100%;
+    min-width: 80px;
+    max-width: 120px;
+    padding: 7px 10px;
+    font-size: 1.05rem;
+    border: 1.5px solid #007bff;
+    border-radius: 6px;
+    text-align: center;
+    background: #f4f8ff;
+    transition: border-color 0.2s;
+  }
+  .input-group input[type="number"]:focus {
+    border-color: #0056b3;
+    outline: none;
+  }
+  .file-row {
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  input[type="file"] {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1.5px solid #007bff;
+    background: #f4f8ff;
+    font-size: 1rem;
+  }
+  
+  /* Drag and drop zone styling */
+  .drop-zone {
+    border: 2px dashed #007bff;
+    border-radius: 10px;
+    background: #eaf2fb;
+    color: #007bff;
+    padding: 32px 10px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+    transition: background 0.2s, border-color 0.2s;
+    cursor: pointer;
+    user-select: none;
+  }
+  .drop-zone.dragover {
+    background: #d0e7ff;
+    border-color: #0056b3;
+    color: #0056b3;
+  }
+  
+  /* Center aligned button container */
+  .center-btn {
+    text-align: center;
+    margin-top: 18px;
+    margin-bottom: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+  }
+  button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+    transition: background 0.2s;
+    margin: 0 auto;
+    display: inline-block;
+  }
+  
+  /* Button hover effect */
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Status and warning message styling */
+  #status {
+    margin-top: 18px;
+    font-weight: 700;
+    color: #007bff;
+    font-size: 1.08rem;
+    text-align: center;
+  }
+  #warning {
+    color: #d9534f;
+    margin-top: 10px;
+    font-weight: 700;
+    text-align: center;
+    font-size: 1.05rem;
+  }
+  
+  /* Select all checkbox container */
+  #selectAllContainer {
+    margin-top: 18px;
+    margin-bottom: -10px;
+    font-weight: 600;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  #selectAll {
+    accent-color: #007bff;
+    transform: scale(1.2);
+    margin-right: 8px;
+    margin-left: 24px;
+  }
+  #selectAllContainer label {
+    margin: 0;
+    font-weight: 600;
+    color: #0056b3;
+    font-size: 1.05rem;
+  }
+  
+  /* Results table styling */
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 28px;
+    background: #f7fbff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,123,255,0.07);
+  }
+  th, td {
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 1.05rem;
+  }
+  th {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: 700;
+    border-bottom: 2px solid #007bff;
+  }
+  tr:nth-child(even) td {
+    background: #eaf2fb;
+  }
+  tr:nth-child(odd) td {
+    background: #f7fbff;
+  }
+  
+  /* Highlighted roll dimension cell */
+  td.bold-roll {
+    font-weight: 700;
+    color: #0056b3;
+    background: #e3f0ff;
+    border-radius: 6px;
+    font-size: 1.08rem;
+    box-shadow: 0 1px 4px rgba(0,123,255,0.04);
+  }
+  .row-check {
+    accent-color: #007bff;
+    transform: scale(1.15);
+  }
+  
+  /* Roll option select dropdown */
+  .option-select {
+    font-weight: 700;
+    color: #007bff;
+    border: 1.5px solid #007bff;
+    border-radius: 6px;
+    padding: 4px 8px;
+    background: #fff;
+    font-size: 1.05rem;
+    cursor: pointer;
+    min-width: 70px;
+    text-align: center;
+  }
+  
+  /* Roll summary section styling */
+  #rollSummary {
+    margin-top: 28px;
+    font-weight: 700;
+    background: #e9ecef;
+    padding: 18px 22px;
+    border-radius: 10px;
+    font-size: 1.08rem;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.07);
+    color: #222;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #rollSummary table {
+    width: 100%;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0;
+  }
+  #rollSummary th, #rollSummary td {
+    padding: 8px 6px;
+    font-size: 1.04rem;
+    background: none;
+    border: none;
+    text-align: right;
+  }
+  #rollSummary th {
+    color: #007bff;
+    font-weight: 700;
+    text-align: left;
+    font-size: 1.06rem;
+  }
+  #rollSummary td.roll {
+    color: #0056b3;
+    font-weight: 700;
+    text-align: left;
+  }
+  #rollSummary td.len {
+    color: #222;
+    font-weight: 700;
+    text-align: right;
+  }
+  
+  /* User guide section styling */
+  #guide {
+    margin: 40px auto 0 auto;
+    max-width: 900px;
+    background: #eaf2fb;
+    border-left: 6px solid #007bff;
+    border-radius: 10px;
+    padding: 22px 26px 18px 26px;
+    font-size: 1.08rem;
+    color: #1a3557;
+    box-shadow: 0 2px 12px rgba(0,123,255,0.06);
+  }
+  #guide h3 {
+    color: #007bff;
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: 700;
+    text-align: left;
+  }
+  #guide ul {
+    margin: 0 0 0 18px;
+    padding: 0;
+  }
+  #guide li {
+    margin-bottom: 7px;
+  }
+  
+  /* Bottom spacing for mobile scrolling */
+  .site-bottom-space {
+    height: 60px;
+    width: 100%;
+  }
+  hr {
+    border: none;
+    border-top: 2px solid #e0e0e0;
+    margin: 18px 0 18px 0;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Mobile responsive styles */
+  @media (max-width: 700px) {
+    .container { padding: 12px 4px; }
+    table, th, td { font-size: 0.95rem; }
+    .inputs-row { flex-direction: column; gap: 10px; align-items: stretch; }
+    .input-group { min-width: 0; width: 100%; }
+    .center-btn { margin-top: 12px; flex-direction: column; gap: 10px; }
+    button { width: 100%; }
+    .drop-zone { font-size: 1rem; padding: 18px 2px; }
+    #guide { padding: 12px 8px; font-size: 0.98rem; }
+    #rollSummary { padding: 10px 2px; }
+    #rollSummary th, #rollSummary td { font-size: 0.97rem; }
+    .site-bottom-space { height: 40px; }
+    #selectAll { margin-left: 0; }
+  }
+  #rollSummary th.len, #rollSummary td.len {
+    text-align: right !important;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>PDF<span style="color:hwb(226 31% 37%);">Roll</span>Calculator</h1>
+  <h2><span style="color: #007bff;">Smart Calculator</span> for Wide Format Printing</h2>
+  <hr />
+
+  <div class="inputs-row">
+    <div class="input-group">
+      <label for="roll1">Roll 1 (mm)</label>
+      <input type="number" id="roll1" min="0" value="297" />
+    </div>
+    <div class="input-group">
+      <label for="roll2">Roll 2 (mm)</label>
+      <input type="number" id="roll2" min="0" value="420" />
+    </div>
+    <div class="input-group">
+      <label for="roll3">Roll 3 (mm)</label>
+      <input type="number" id="roll3" min="0" value="610" />
+    </div>
+    <div class="input-group">
+      <label for="roll4">Roll 4 (mm)</label>
+      <input type="number" id="roll4" min="0" value="914" />
+    </div>
+    <div class="input-group">
+      <label for="extraLength">Added (mm)</label>
+      <input type="number" id="extraLength" min="0" max="200" value="40" step="1" />
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="file-row">
+    <div id="dropZone" class="drop-zone">Drag PDF files here</div>
+    <div id="fileHint" style="margin-top:10px; color:#007bff; font-weight:600;"></div>
+  </div>
+
+  <div class="center-btn">
+    <button id="processBtn">Calculate</button>
+  </div>
+
+  <div id="status"></div>
+  <div id="warning"></div>
+
+  <div id="selectAllContainer" style="display:none;">
+    <input type="checkbox" id="selectAll" />
+    <label for="selectAll">Select all</label>
+  </div>
+
+  <table id="resultsTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>Select</th>
+        <th>File</th>
+        <th>Width (mm)</th>
+        <th>Height (mm)</th>
+        <th>Roll (mm)</th>
+        <th style="text-align:right;">Linear length (m)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="rollSummary" style="display:none;"></div>
+</div>
+
+<div id="guide"> 
+  <h3>How to use the program</h3>
+  <ul>
+    <li><b>Check the settings</b> above for roll widths and added <b>mm</b> for cutting. If you will not use a roll, set it to <b>0</b>.</li>
+
+    <li><b>Drag the PDF files</b> into the blue area. You can add multiple files at once.</li>
+
+    <li><b>The sizes here</b> are exactly those that will be printed. If you have cropped the files, you will see the cropped sizes. Usually, they match those at the bottom left in Adobe Reader. If you are not sure, check in Adobe with Ctrl+D.</li>
+
+    <li>Click <b>Calculate</b> for analysis and optimal roll allocation.</li>
+
+    <li><b>Select the files</b> you want to print. Only the selected ones are included in the total result.</li>
+    <li>For some files, <b>you can manually set rolls</b> if you think the suggested ones are not suitable.</li>
+  </ul>
+</div>
+<div class="site-bottom-space"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script>
+  // Global variable for extra cutting length in mm
+  let EXTRA_LENGTH = 40;
+
+  // Get references to roll input elements
+  const rollInputs = [
+    document.getElementById('roll1'),
+    document.getElementById('roll2'),
+    document.getElementById('roll3'),
+    document.getElementById('roll4'),
+  ];
+
+  // Get references to UI elements
+  const dropZone = document.getElementById('dropZone');
+  const fileHint = document.getElementById('fileHint');
+  const processBtn = document.getElementById('processBtn');
+  const statusDiv = document.getElementById('status');
+  const warningDiv = document.getElementById('warning');
+  const resultsTable = document.getElementById('resultsTable');
+  const tbody = resultsTable.querySelector('tbody');
+  const rollSummaryDiv = document.getElementById('rollSummary');
+  const selectAllContainer = document.getElementById('selectAllContainer');
+  const selectAllCheckbox = document.getElementById('selectAll');
+  const extraLengthInput = document.getElementById('extraLength');
+
+  // Global variables for storing selected files and processing results
+  let selectedFiles = [];
+  let results = [];
+
+  // Event listener: Handle drag over effect
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  // Event listener: Handle drag leave effect
+  dropZone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+  });
+
+  // Event listener: Handle file drop
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    let files = Array.from(e.dataTransfer.files).filter(f => f.name.toLowerCase().endsWith('.pdf'));
+    if (files.length === 0) {
+      warningDiv.textContent = "Please, drop only PDF files.";
+      selectedFiles = [];
+      updateFileHint();
+      return;
+    }
+    selectedFiles = files;
+    updateFileHint();
+  });
+
+  // Function: Update file hint display with number of selected files
+  function updateFileHint() {
+    if (selectedFiles.length > 0) {
+      fileHint.textContent = `Selected files: ${selectedFiles.length}`;
+    } else {
+      fileHint.textContent = '';
+    }
+  }
+
+  // Function: Get valid roll widths from input fields (sorted ascending)
+  function getRolls() {
+    return rollInputs
+      .map(input => {
+        const val = parseFloat(input.value); // Use parseFloat instead of parseInt
+        return (isNaN(val) || val <= 0) ? null : val;
+      })
+      .filter(v => v !== null)
+      .sort((a,b) => a - b);
+  }
+
+  // Function: Find best roll orientation for given PDF dimensions
+  // Returns only the best option for each roll (least waste)
+  function getAllOptions(width, height, rolls) {
+    const opts = [];
+    rolls.forEach(r => {
+      let best = null;
+      // Check original orientation (width fits in roll)
+      if (r >= width) {
+        best = {
+          orientation: "original",
+          roll_mm: r,
+          waste: r - width,
+          used_dim: height
+        };
+      }
+      // Check rotated orientation (height fits in roll)
+      if (r >= height) {
+        const rotated = {
+          orientation: "rotated",
+          roll_mm: r,
+          waste: r - height,
+          used_dim: width
+        };
+        if (!best || rotated.waste < best.waste) {
+          best = rotated;
+        }
+      }
+      if (best) opts.push(best);
+    });
+    return opts;
+  }
+
+  // Function: Extract PDF page dimensions in millimeters
+  async function getPageSizeMm(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+    const page = pdfDoc.getPage(0);
+    
+    // Try to get dimensions in priority order:
+    // 1. CropBox (what user sees in Adobe Reader) - most common
+    // 2. TrimBox (final size after trimming) - professional files
+    // 3. MediaBox (full page size) - fallback
+    let width, height;
+    try {
+      // Try CropBox first - use proper PDF-lib API
+      const cropBox = page.getCropBox();
+      if (cropBox && cropBox.width > 0 && cropBox.height > 0) {
+        width = cropBox.width;
+        height = cropBox.height;
+      } else {
+        // Try TrimBox if CropBox is not available - use proper PDF-lib API
+        const trimBox = page.getTrimBox();
+        if (trimBox && trimBox.width > 0 && trimBox.height > 0) {
+          width = trimBox.width;
+          height = trimBox.height;
+        } else {
+          // Fallback to MediaBox
+          const { width: w, height: h } = page.getSize();
+          width = w;
+          height = h;
+        }
+      }
+    } catch (e) {
+      // Final fallback to MediaBox if all else fails
+      const { width: w, height: h } = page.getSize();
+      width = w;
+      height = h;
+    }
+    
+    // Validate dimensions are positive
+    if (width <= 0 || height <= 0) {
+      throw new Error(`Invalid page dimensions: ${width} x ${height}`);
+    }
+    
+    // Convert from points to millimeters (1 point = 25.4/72 mm)
+    const widthMm = +(width * 25.4 / 72).toFixed(2);
+    const heightMm = +(height * 25.4 / 72).toFixed(2);
+    return { width: widthMm, height: heightMm };
+  }
+
+  // Function: Create table row for each processed PDF file
+  function createRow(data, idx) {
+    const tr = document.createElement('tr');
+    
+    // Checkbox column
+    const tdCheck = document.createElement('td');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = false;
+    checkbox.className = 'row-check';
+    checkbox.dataset.idx = idx;
+    tdCheck.appendChild(checkbox);
+    tr.appendChild(tdCheck);
+
+    // File name column
+    const tdFile = document.createElement('td');
+    tdFile.textContent = data.file_name;
+    tr.appendChild(tdFile);
+
+    // Width and height columns with highlighting for active dimension
+    let highlightIdx = null;
+    if (typeof data.roll_mm === 'number') {
+      // If orientation is original, width fits in roll (highlight width)
+      // If rotated, height fits in roll (highlight height)
+      highlightIdx = data.orientation === 'original' ? 0 : 1;
+    }
+    ['width_mm', 'height_mm'].forEach((key, i) => {
+      const td = document.createElement('td');
+      td.textContent = data[key];
+      if (i === highlightIdx) td.classList.add('bold-roll');
+      tr.appendChild(td);
+    });
+
+    // Roll column (dropdown if multiple options available, static value otherwise)
+    const tdRoll = document.createElement('td');
+    if (data.options && data.options.length > 1) {
+      // Create dropdown for multiple roll options
+      const select = document.createElement('select');
+      select.className = 'option-select';
+      data.options.forEach((opt, i) => {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = opt.roll_mm;
+        if (opt.roll_mm === data.roll_mm && opt.orientation === data.orientation) option.selected = true;
+        select.appendChild(option);
+      });
+      
+      // Handle roll option change
+      select.addEventListener('change', function() {
+        const sel = data.options[parseInt(this.value)];
+        data.roll_mm = sel.roll_mm;
+        data.orientation = sel.orientation;
+        data.linear_m = ((sel.used_dim + EXTRA_LENGTH) / 1000).toFixed(2);
+        
+        // Update highlighting for width/height based on new orientation
+        const tds = tr.querySelectorAll('td');
+        tds[2].classList.remove('bold-roll');
+        tds[3].classList.remove('bold-roll');
+        const newHighlight = sel.orientation === 'original' ? 0 : 1;
+        tds[2 + newHighlight].classList.add('bold-roll');
+        tdRoll.querySelectorAll('option').forEach((o, i) => {
+          o.selected = (i === parseInt(this.value));
+        });
+        tdLinear.textContent = data.linear_m;
+        updateSummaryAndTotal();
+      });
+      tdRoll.appendChild(select);
+      tdRoll.classList.add('bold-roll');
+    } else {
+      tdRoll.textContent = data.roll_mm;
+      if(typeof data.roll_mm === 'number') tdRoll.classList.add('bold-roll');
+    }
+    tr.appendChild(tdRoll);
+
+    // Linear length column
+    const tdLinear = document.createElement('td');
+    tdLinear.textContent = data.linear_m;
+    tdLinear.style.fontWeight = '700';
+    tdLinear.style.color = '#007bff';
+    tdLinear.style.textAlign = 'right';
+    tr.appendChild(tdLinear);
+
+    return tr;
+  }
+
+  // Function: Calculate total linear length for each roll based on selected files
+  function calculateRollSummary(results, checkedIdxs) {
+    const summary = {};
+    results.forEach((row, idx) => {
+      if (!checkedIdxs.has(idx)) return;
+      if (typeof row.roll_mm === 'number') {
+        if (!summary[row.roll_mm]) summary[row.roll_mm] = 0;
+        if (row.linear_m !== '-') summary[row.roll_mm] += parseFloat(row.linear_m);
+      }
+    });
+    return summary;
+  }
+
+  // Event listener: Update extra cutting length when input changes
+  extraLengthInput.addEventListener('input', () => {
+    let val = parseInt(extraLengthInput.value);
+    if (isNaN(val) || val < 0) val = 0;
+    if (val > 200) val = 200;
+    EXTRA_LENGTH = val;
+    // Update summary if results exist
+    if (typeof updateSummaryAndTotal === 'function') {
+      updateSummaryAndTotal();
+    }
+  });
+
+  // Function to update roll summary and totals - will be redefined later
+  let updateSummaryAndTotal = null;
+
+  // Main event listener: Process button click - analyze all PDF files
+  processBtn.addEventListener('click', async () => {
+    // Update extra length value from input (remove duplication)
+    const rolls = getRolls();
+    
+    // Reset UI state
+    warningDiv.textContent = '';
+    tbody.innerHTML = '';
+    resultsTable.style.display = 'none';
+    statusDiv.textContent = '';
+    rollSummaryDiv.style.display = 'none';
+    selectAllContainer.style.display = 'none';
+
+    let files = selectedFiles;
+    
+    // Validation: Check if files are selected
+    if (!files || files.length === 0) {
+      warningDiv.textContent = 'Please, select at least one PDF file.';
+      return;
+    }
+
+    // Validation: Check if at least one roll is configured
+    if(rolls.length === 0){
+      warningDiv.textContent = 'Please, set at least one valid roll (value > 0).';
+      return;
+    }
+
+    // Sort files alphabetically by name (Windows Explorer style)
+    files = files.slice().sort((a, b) => {
+      const aName = a.name;
+      const bName = b.name;
+      
+      // Split into parts for natural sorting
+      const splitPath = (path) => {
+        return path.split(/(\d+)/).filter(part => part !== '');
+      };
+      
+      const aParts = splitPath(aName);
+      const bParts = splitPath(bName);
+      
+      // Compare part by part
+      const maxLength = Math.max(aParts.length, bParts.length);
+      for (let i = 0; i < maxLength; i++) {
+        const aPart = aParts[i] || '';
+        const bPart = bParts[i] || '';
+        
+        // Check if both parts are numeric
+        const aIsNum = /^\d+$/.test(aPart);
+        const bIsNum = /^\d+$/.test(bPart);
+        
+        if (aIsNum && bIsNum) {
+          // Convert to numbers for comparison
+          const aNum = parseInt(aPart, 10);
+          const bNum = parseInt(bPart, 10);
+          
+          if (aNum !== bNum) {
+            return aNum - bNum;
+          }
+          // If numbers are equal, the one with leading zeros comes first
+          // More leading zeros = longer string for same number
+          if (aPart.length !== bPart.length) {
+            return bPart.length - aPart.length; // Longer string (more leading zeros) first
+          }
+          return aPart.localeCompare(bPart);
+        } else {
+          // Regular string comparison for non-numeric parts
+          const stringCompare = aPart.localeCompare(bPart);
+          if (stringCompare !== 0) return stringCompare;
+        }
+      }
+      return 0;
+    });
+
+    statusDiv.textContent = 'Processing files, please wait...';
+
+    results = [];
+    let noRollFitCount = 0;
+
+    // Process each PDF file
+    for(let i=0; i<files.length; i++){
+      try {
+        const file = files[i];
+        const {width, height} = await getPageSizeMm(file);
+
+        // Validate dimensions
+        if (width <= 0 || height <= 0) {
+          throw new Error(`Invalid dimensions: ${width}x${height}`);
+        }
+
+        // Find all possible roll options for this PDF
+        const options = getAllOptions(width, height, rolls).map(opt => ({
+          orientation: opt.orientation,
+          roll_mm: opt.roll_mm,
+          linear_m: ((opt.used_dim + EXTRA_LENGTH) / 1000).toFixed(2),
+          used_dim: opt.used_dim,
+          waste: opt.waste
+        }));
+
+        if(options.length === 0){
+          // No suitable roll found for this PDF
+          noRollFitCount++;
+          results.push({
+            file_name: file.name,
+            width_mm: width.toFixed(2),
+            height_mm: height.toFixed(2),
+            orientation: 'N/A',
+            roll_mm: 'No suitable roll',
+            linear_m: '-',
+            options: []
+          });
+        } else {
+          // Select best option (minimum waste)
+          let best = options[0];
+          options.forEach(opt => {
+            if (opt.waste < best.waste) best = opt;
+          });
+          results.push({
+            file_name: file.name,
+            width_mm: width.toFixed(2),
+            height_mm: height.toFixed(2),
+            orientation: best.orientation,
+            roll_mm: best.roll_mm,
+            linear_m: best.linear_m,
+            options: options.length > 1 ? options : null
+          });
+        }
+
+        // Update progress status
+        statusDiv.textContent = `Processed ${i+1} of ${files.length} files...`;
+
+      } catch(e){
+        console.error(`Error processing file ${files[i].name}:`, e);
+        // Add failed file to results with error message
+        results.push({
+          file_name: files[i].name,
+          width_mm: 'Error',
+          height_mm: 'Error',
+          orientation: 'N/A',
+          roll_mm: 'Error reading',
+          linear_m: '-',
+          options: []
+        });
+      }
+    }
+
+    // Render table rows for all processed files
+    tbody.innerHTML = '';
+    results.forEach((row, idx) => {
+      if (row.options && Array.isArray(row.options)) row.options = row.options;
+      else if (row.options === null) delete row.options;
+      tbody.appendChild(createRow(row, idx));
+    });
+
+    // Show results table and select all option
+    resultsTable.style.display = 'table';
+    selectAllContainer.style.display = 'flex';
+
+    // Define function to update roll summary and totals
+    updateSummaryAndTotal = function() {
+      // Get indices of checked rows
+      const checkedIdxs = new Set();
+      document.querySelectorAll('.row-check').forEach(cb => {
+        if(cb.checked) checkedIdxs.add(Number(cb.dataset.idx));
+      });
+      const rollSummary = calculateRollSummary(results, checkedIdxs);
+
+      // Generate summary HTML table
+      let summaryHtml = '<table>';
+      summaryHtml += '<tr><th>Roll (mm)</th><th class="len">Total linear length (m)</th></tr>';
+      Object.keys(rollSummary).sort((a,b)=>a-b).forEach(roll => {
+        const len = rollSummary[roll].toFixed(2);
+        summaryHtml += `<tr><td class="roll">${roll}</td><td class="len">${len}</td></tr>`;
+      });
+      summaryHtml += '</table>';
+      rollSummaryDiv.innerHTML = summaryHtml;
+      rollSummaryDiv.style.display = 'block';
+
+      statusDiv.textContent = `Done! Processed ${results.length} files.`;
+    };
+
+    // Initial summary calculation
+    updateSummaryAndTotal();
+
+    // Add event listeners to all row checkboxes for summary updates
+    tbody.querySelectorAll('.row-check').forEach(cb => {
+      cb.addEventListener('change', updateSummaryAndTotal);
+    });
+
+    // Setup "Select All" checkbox functionality
+    selectAllCheckbox.checked = false;
+    selectAllCheckbox.onchange = function() {
+      const checked = selectAllCheckbox.checked;
+      tbody.querySelectorAll('.row-check').forEach(cb => {
+        cb.checked = checked;
+      });
+      updateSummaryAndTotal();
+    };
+
+    // Update "Select All" state when individual checkboxes change
+    tbody.querySelectorAll('.row-check').forEach(cb => {
+      cb.addEventListener('change', function() {
+        const all = Array.from(tbody.querySelectorAll('.row-check'));
+        selectAllCheckbox.checked = all.length > 0 && all.every(c => c.checked);
+      });
+    });
+
+    // Show warning if some files didn't fit any roll
+    if(noRollFitCount > 0){
+      warningDiv.textContent = `Warning: ${noRollFitCount} file(s) had no suitable roll!`;
+    }
+
+  });
+</script>
+</body>
+</html>
